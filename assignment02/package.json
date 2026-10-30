@@ -1,0 +1,26 @@
+{
+  "name": "assignment02",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anishbw/Assignment02.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anishbw/Assignment02/issues"
+  },
+  "homepage": "https://github.com/anishbw/Assignment02#readme",
+  "dependencies": {
+    "express": "^5.3.0",
+    "mongoose": "^9.11.4",
+    "zod": "^4.6.7"
+  }
+}
