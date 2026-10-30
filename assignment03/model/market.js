@@ -23,8 +23,28 @@ const marketSchema = new mongoose.Schema({
         type: Boolean,
         default: null,
     },
+    remainingWager: {
+        type: Number,
+        required: true,
+    },
+});
+
+const betSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+    },
+    marketId: {
+        type: String,
+        required: true,
+    },
+    betAmount: {
+        type: Number,
+        required: true,
+    },
 });
 
 const Market = mongoose.model("Market", marketSchema);
+const Bet = mongoose.model("Bet", betSchema);
 
-export default Market;
+export { Market, Bet };

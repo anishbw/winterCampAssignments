@@ -8,4 +8,11 @@ const marketSchema = z
     })
     .strict();
 
-export default marketSchema;
+const betSchema = z
+    .object({
+        marketId: z.string(),
+        betAmount: z.number().positive(),
+    })
+    .strict();
+
+export { marketSchema, betSchema };
