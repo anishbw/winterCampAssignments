@@ -184,4 +184,19 @@ const showMarket = async (req, res) => {
     }
 };
 
-export { createMarket, betMarket, showMarket };
+const showBet = async (req, res) => {
+    try {
+        const bets = await Bet.find({ userId: req.user.id });
+
+        return res.status(200).json({
+            message: "Bets fetched Sucessfully",
+            bets,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+    }
+};
+
+export { createMarket, betMarket, showMarket, showBet };
