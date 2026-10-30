@@ -97,4 +97,24 @@ const signin = async (req, res) => {
     }
 };
 
-export { signin, signup, onramp };
+const profile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+
+        if (!user)
+            return res.status(404).json({
+                message: "User not Found",
+            });
+
+        return res.status(200).json({
+            userName: user.username,
+            balance: user.balance,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+export { signin, signup, onramp, profile };
