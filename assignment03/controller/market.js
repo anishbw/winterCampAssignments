@@ -3,30 +3,6 @@ import { Market, Bet } from "../model/market";
 import { marketSchema, betSchema } from "../types/market";
 import mongoose from "mongoose";
 
-const onramp = async (req, res) => {
-    try {
-        const user = await User.findByIdAndUpdate(
-            req.user.id,
-            { $inc: { balance: 500 } },
-            { returnDocument: "after" },
-        );
-
-        if (!user)
-            return res.status(404).json({
-                message: "User not Found",
-            });
-
-        return res.status(200).json({
-            message: "Balance updated successfully",
-            balance: user.balance,
-        });
-    } catch (err) {
-        return res.status(500).json({
-            message: "Internal server error",
-        });
-    }
-};
-
 const createMarket = async (req, res) => {
     const result = marketSchema.safeParse(req.body);
 
@@ -193,4 +169,4 @@ const betMarket = async (req, res) => {
     }
 };
 
-export { onramp, createMarket, betMarket };
+export { createMarket, betMarket };

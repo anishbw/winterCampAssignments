@@ -2,6 +2,30 @@ import { signUpSchema, signInSchema } from "../types/auth";
 import User from "../model/user";
 import jwt from "jsonwebtoken";
 
+const onramp = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { $inc: { balance: 500 } },
+            { returnDocument: "after" },
+        );
+
+        if (!user)
+            return res.status(404).json({
+                message: "User not Found",
+            });
+
+        return res.status(200).json({
+            message: "Balance updated successfully",
+            balance: user.balance,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
 const signup = async (req, res) => {
     const result = signUpSchema.safeParse(req.body);
 
@@ -73,4 +97,4 @@ const signin = async (req, res) => {
     }
 };
 
-export { signin, signup };
+export { signin, signup, onramp };
