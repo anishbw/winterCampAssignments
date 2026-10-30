@@ -169,4 +169,19 @@ const betMarket = async (req, res) => {
     }
 };
 
-export { createMarket, betMarket };
+const showMarket = async (req, res) => {
+    try {
+        const markets = await Market.find({ resolution: null });
+
+        return res.status(200).json({
+            message: "Markets fetched Sucessfully",
+            markets,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal Server Error",
+        });
+    }
+};
+
+export { createMarket, betMarket, showMarket };
