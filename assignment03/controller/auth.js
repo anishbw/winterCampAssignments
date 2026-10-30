@@ -1,0 +1,76 @@
+import { signUpSchema, signInSchema } from "../types/auth";
+import User from "../model/user";
+import jwt from "jsonwebtoken";
+
+const signup = async (req, res) => {
+    const result = signUpSchema.safeParse(req.body);
+
+    if (!result.success)
+        return res.status(400).json({
+            message: result.error.issues[0]?.message,
+        });
+
+    try {
+        const hash = await Bun.password.hash(result.data.password);
+        await User.create({
+            username: result.data.username,
+            password: hash,
+        });
+
+        return res.status(201).json({
+            message: `Account ${result.data.username} created successfully`,
+        });
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({
+                message: "Username already taken",
+            });
+        }
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+const signin = async (req, res) => {
+    const result = signInSchema.safeParse(req.body);
+
+    if (!result.success)
+        return res.status(400).json({
+            message: result.error.issues[0]?.message,
+        });
+
+    try {
+        const user = await User.findOne({
+            username: result.data.username,
+        });
+
+        if (!user)
+            return res.status(401).json({
+                message: "Invalid Credentials",
+            });
+
+        const check = await Bun.password.verify(
+            result.data.password,
+            user.password,
+        );
+
+        if (!check)
+            return res.status(401).json({
+                message: "Invalid Credentials",
+            });
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+        return res.status(200).json({
+            message: `Signed in successfully`,
+            token: token,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+export { signin, signup };
