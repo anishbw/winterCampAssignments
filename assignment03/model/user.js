@@ -18,6 +18,22 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-const User = mongoose.model("User", userSchema);
+const transactionSchema = new mongoose.Schema({
+    userId: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true,
+    },
+});
 
-export default User;
+const User = mongoose.model("User", userSchema);
+const WalletEvent = mongoose.model("WalletEvent", transactionSchema);
+
+export { WalletEvent, User };

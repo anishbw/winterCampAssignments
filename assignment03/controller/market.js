@@ -1,4 +1,4 @@
-import User from "../model/user";
+import { User, WalletEvent } from "../model/user";
 import { Market, Bet } from "../model/market";
 import { marketSchema, betSchema } from "../types/market";
 import mongoose from "mongoose";
@@ -40,6 +40,19 @@ const createMarket = async (req, res) => {
             });
 
         try {
+            await WalletEvent.create({
+                userId: req.user.id,
+                amount: result.data.initialWager,
+                type: "createMarket",
+            });
+        } catch (err) {
+            await User.findByIdAndUpdate(req.user.id, {
+                $inc: { balance: result.data.initialWager },
+            });
+            throw err;
+        }
+
+        try {
             const newMarket = await Market.create({
                 title: result.data.title,
                 side: result.data.side,
@@ -57,9 +70,7 @@ const createMarket = async (req, res) => {
             await User.findByIdAndUpdate(req.user.id, {
                 $inc: { balance: result.data.initialWager },
             });
-            return res.status(500).json({
-                message: "Internal Server Error",
-            });
+            throw err;
         }
     } catch (err) {
         return res.status(500).json({
@@ -139,6 +150,22 @@ const betMarket = async (req, res) => {
         }
 
         try {
+            await WalletEvent.create({
+                userId: req.user.id,
+                amount: result.data.betAmount,
+                type: "Bet",
+            });
+        } catch (err) {
+            await User.findByIdAndUpdate(req.user.id, {
+                $inc: { balance: result.data.betAmount },
+            });
+            await Market.findByIdAndUpdate(result.data.marketId, {
+                $inc: { remainingWager: result.data.betAmount },
+            });
+            throw err;
+        }
+
+        try {
             const newBet = await Bet.create({
                 userId: req.user.id,
                 marketId: result.data.marketId,
@@ -158,9 +185,7 @@ const betMarket = async (req, res) => {
             await Market.findByIdAndUpdate(result.data.marketId, {
                 $inc: { remainingWager: result.data.betAmount },
             });
-            return res.status(500).json({
-                message: "Internal Server Error",
-            });
+            throw err;
         }
     } catch (err) {
         return res.status(500).json({

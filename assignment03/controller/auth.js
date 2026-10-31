@@ -1,5 +1,5 @@
 import { signUpSchema, signInSchema } from "../types/auth";
-import User from "../model/user";
+import { User, WalletEvent } from "../model/user";
 import jwt from "jsonwebtoken";
 
 const onramp = async (req, res) => {
@@ -14,6 +14,21 @@ const onramp = async (req, res) => {
             return res.status(404).json({
                 message: "User not Found",
             });
+
+        try {
+            await WalletEvent.create({
+                userId: req.user.id,
+                amount: 500,
+                type: "onramp",
+            });
+        } catch (err) {
+            await User.findByIdAndUpdate(
+                req.user.id,
+                { $inc: { balance: -500 } },
+                { returnDocument: "after" },
+            );
+            throw err;
+        }
 
         return res.status(200).json({
             message: "Balance updated successfully",
@@ -117,4 +132,21 @@ const profile = async (req, res) => {
     }
 };
 
-export { signin, signup, onramp, profile };
+const walletEvents = async (req, res) => {
+    try {
+        const transactions = await WalletEvent.find({
+            userId: req.user.id,
+        }).sort({ _id: -1 });
+
+        return res.status(200).json({
+            message: "Transactions fetched successfully",
+            transactions,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+export { signin, signup, onramp, profile, walletEvents };
