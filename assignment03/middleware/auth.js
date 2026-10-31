@@ -13,6 +13,12 @@ const protectRoute = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (err) {
+        if (err.name === "TokenExpiredError") {
+            return res.status(401).json({
+                message: "Token has expired. Please log in again.",
+            });
+        }
+
         return res.status(401).json({
             message: "Unauthorized access",
         });
